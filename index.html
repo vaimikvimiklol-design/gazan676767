@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>gazan 6767</title>
+    <style>
+        /* Черный минималистичный фон на весь экран */
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            background-color: #0b0b0b;
+            font-family: sans-serif;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Фиксируем кнопку ВНИЗУ по центру экрана */
+        .wrapper {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 999999; /* Всегда поверх всех видео */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Кнопка с красивой плавной анимацией */
+        .play-btn {
+            padding: 20px 40px;
+            font-size: 18px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: #ffffff;
+            background: rgba(11, 11, 11, 0.8); /* Слегка прозрачный фон, чтоб сквозь нее было видно ад */
+            border: 2px solid #ffffff;
+            cursor: pointer;
+            border-radius: 5px;
+            outline: none;
+            transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+            animation: pulse 2.5s infinite alternate;
+            white-space: nowrap;
+            backdrop-filter: blur(5px); /* Размытие фона за кнопкой */
+        }
+
+        .play-btn:hover {
+            background-color: #ffffff;
+            color: #0b0b0b;
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.6);
+        }
+
+        /* Эффект жесткого клика (для спама самое то) */
+        .play-btn:active {
+            transform: scale(0.92);
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+        }
+
+        /* Контейнер для видео */
+        .video-container {
+            position: absolute;
+            background-color: #000;
+            border: 3px solid rgba(255, 255, 255, 0);
+            border-radius: 8px;
+            opacity: 0;
+            box-shadow: 0 0 0px rgba(255, 255, 255, 0);
+            overflow: hidden;
+            display: block;
+            animation: frameFlicker 0.8s forwards ease-in-out;
+        }
+
+        /* Элемент видео внутри рамки */
+        video {
+            display: block;
+            width: 100%;
+            height: auto;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        video.show {
+            opacity: 1;
+        }
+
+        /* Анимация пульсации кнопки */
+        @keyframes pulse {
+            0% { box-shadow: 0 0 10px rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.5); }
+            100% { box-shadow: 0 0 20px rgba(255, 255, 255, 0.3); border-color: rgba(255, 255, 255, 1); }
+        }
+
+        /* Эффект быстрого размигивания неоновой рамки */
+        @keyframes frameFlicker {
+            0% { border-color: rgba(255, 255, 255, 0); box-shadow: 0 0 0px rgba(255, 255, 255, 0); opacity: 0; }
+            15% { border-color: rgba(255, 255, 255, 0.9); box-shadow: 0 0 15px rgba(255, 255, 255, 0.5); opacity: 1; }
+            30% { border-color: rgba(255, 255, 255, 0.1); box-shadow: 0 0 2px rgba(255, 255, 255, 0.1); }
+            50% { border-color: rgba(255, 255, 255, 1); box-shadow: 0 0 25px rgba(255, 255, 255, 0.6); }
+            70% { border-color: rgba(255, 255, 255, 0.2); box-shadow: 0 0 5px rgba(255, 255, 255, 0.1); }
+            100% { border-color: rgba(255, 255, 255, 1); box-shadow: 0 0 20px rgba(255, 255, 255, 0.4); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="wrapper">
+        <button class="play-btn" id="musicBtn">gazan 6767</button>
+    </div>
+
+    <div id="chaosSpawnPoint"></div>
+
+    <script>
+        const btn = document.getElementById('musicBtn');
+        const chaosSpawnPoint = document.getElementById('chaosSpawnPoint');
+        
+        // Счетчик для динамического z-index, чтобы каждый новый клик клал видео ПОВЕРХ старых
+        let clickCount = 0;
+
+        btn.addEventListener('click', () => {
+            clickCount++;
+
+            // 1. Создаем контейнер рамки
+            const box = document.createElement('div');
+            box.className = 'video-container';
+            
+            // РАНДОМНЫЙ РАЗМЕР (от 15% до 45% ширины экрана)
+            const randomWidth = Math.floor(Math.random() * (45 - 15 + 1)) + 15;
+            box.style.width = randomWidth + '%';
+
+            // РАНДОМНАЯ ПОЗИЦИЯ (с учетом размеров, чтоб не улетало за экран и не сильно перекрывало саму кнопку снизу)
+            const randomTop = Math.floor(Math.random() * (65 - 2 + 1)) + 2; // ограничил до 65%, чтоб верх кнопки был посвободнее
+            const randomLeft = Math.floor(Math.random() * (95 - randomWidth));
+            
+            box.style.top = randomTop + '%';
+            box.style.left = randomLeft + '%';
+            box.style.zIndex = 10 + clickCount; // Наслаивание
+
+            // 2. Создаем само видео
+            const video = document.createElement('video');
+            video.src = 'video.mp4';
+            video.loop = true; 
+
+            box.appendChild(video);
+            chaosSpawnPoint.appendChild(box);
+
+            // 3. Через 0.6 сек после начала мигания рамки плавно включаем видос со звуком
+            setTimeout(() => {
+                video.classList.add('show');
+                video.play().catch(err => console.log("Браузер блочит до первого взаимодействия, но ты уже кликнул, так что всё ок"));
+            }, 600);
+        });
+    </script>
+
+</body>
+</html>
